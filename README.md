@@ -1,7 +1,5 @@
 # mptet
 
-![mptet-Terminal](http://i.imgur.com/MU4zaw0.png)
-
 A tetris game implemented in modern C++. The aim of this project is to
 implement a relatively clean version of tetris with fairly expansive
 support for a number of different rulesets and configurations.
