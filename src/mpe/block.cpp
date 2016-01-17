@@ -1,8 +1,6 @@
 #include <mpe/field.hpp>
 #include <mpe/block.hpp>
 
-#include <cstdio>
-
 namespace mpe {
 
 static const int INITIAL_X = 3;
@@ -166,16 +164,12 @@ bool Block::rotateRight(const Field& field, const int x, const int y)
 
 bool Block::rotateRight(const Field& field, const wallkick::Wallkick &wt)
 {
-    std::printf("Trying Rotation %d -> %d\n", m_r, (m_r + 1) % 4);
     for (int test = 0; test < wt.count(m_id); ++test) {
         const wallkick::Result wr = wt.right(m_id, m_r, test);
-        std::printf("Right::Attempting wallkick (%d, %d)\n", wr.x, wr.y);
         if (rotateRight(field, wr.x, wr.y)) {
-            std::printf("Success\n\n");
             return true;
         }
     }
-    std::printf("Failure\n\n");
 
     return false;
 }
@@ -201,16 +195,12 @@ bool Block::rotateLeft(const Field& field, const int x, const int y)
 
 bool Block::rotateLeft(const Field& field, const wallkick::Wallkick &wt)
 {
-    std::printf("Trying Rotation %d -> %d\n", m_r, (m_r + 3) % 4);
     for (int test = 0; test < wt.count(m_id); ++test) {
         const wallkick::Result wr = wt.left(m_id, m_r, test);
-        std::printf("Left::Attempting wallkick (%d, %d)\n", wr.x, wr.y);
         if (rotateLeft(field, wr.x, wr.y)) {
-            std::printf("Success\n\n");
             return true;
         }
     }
-    std::printf("Failure\n\n");
 
     return false;
 }

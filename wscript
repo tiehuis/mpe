@@ -18,6 +18,7 @@ def options(ctx):
 def configure(ctx):
     ctx.load('clangxx')
     configure_features(ctx)
+    configure_compiler(ctx)
 
 def configure_features(ctx):
     ctx.check(header_name='linux/input.h')

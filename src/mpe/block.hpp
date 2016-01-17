@@ -43,14 +43,15 @@ class Block
 
     bool collision(const Field& field);
 
-//  private:
-    Point* m_data;
 
-    int m_id;
+/* Member variables */
+    Point* m_data;
 
     int m_x;
 
     int m_y;
+
+    int m_id;
 
     int m_r;
 
