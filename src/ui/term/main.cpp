@@ -46,6 +46,7 @@ class Engine : public BaseEngine
         renderField();
         renderPreview();
         renderHold();
+        renderInfo();
         std::cout.flush();
     }
 
@@ -67,6 +68,13 @@ class Engine : public BaseEngine
 
         std::cout << tr::resetColor;
         std::cout << tr::restoreCursor;
+    }
+
+    void renderInfo() const
+    {
+        std::cout << tr::homePosition;
+        std::cout << tr::moveRelative(15, m_field.getHeight() + 2);
+        std::cout << m_cleared;
     }
 
     void renderHold() const

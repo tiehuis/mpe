@@ -19,7 +19,7 @@ static constexpr int DAS = 8;
 class BaseEngine
 {
   public:
-    BaseEngine() : m_block(0), m_running(true)
+    BaseEngine() : m_block(0), m_running(true), m_cleared(0)
     {
         m_field = mpe::Field();
         m_bag = make_unique<mpe::randomizer::Bag>();
@@ -61,11 +61,15 @@ class BaseEngine
         if (m_keystate[KSpace] == 1) {
             m_block.hardDrop(m_field);
             m_field.placeBlock(m_block);
-            m_field.lineClear();
+            m_cleared += m_field.lineClear();
             m_block = m_bag->next();
         }
 
         if (m_keystate[KQ] == 1) {
+            m_running = false;
+        }
+
+        if (endCondition()) {
             m_running = false;
         }
     }
@@ -78,6 +82,10 @@ class BaseEngine
     virtual void render() const = 0;
 
   protected:
+    bool endCondition() {
+        return m_cleared > 40;
+    }
+
     array<int, 8> m_keystate;
     unique_ptr<mpe::randomizer::Randomizer> m_bag;
     unique_ptr<mpe::wallkick::Wallkick> m_wk;
@@ -85,4 +93,5 @@ class BaseEngine
     experimental::optional<mpe::Block> m_hold;
     mpe::Field m_field;
     bool m_running;
+    int m_cleared;
 };

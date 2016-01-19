@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 APPNAME = 'mptet'
-VERSION = '0.2'
+VERSION = '0.1.0'
 
 top = '.'
 out = 'build'
@@ -52,7 +52,7 @@ def build_engine(ctx):
 
 def build_program(ctx):
     ctx.program(features='cxx',
-                source=ctx.path.ant_glob('src/frontend/term/*.cpp'),
+                source=ctx.path.ant_glob('src/ui/term/*.cpp'),
                 target='bin/mptet',
                 use='mpe_engine')
 
