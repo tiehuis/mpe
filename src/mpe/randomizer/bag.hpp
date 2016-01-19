@@ -1,19 +1,32 @@
+///
+// bag.hpp
+//
+// Specifies a bag randomizer. This randomizer has a bag of size 7, which is
+// then shuffled periodically when a bag empties. This bag guarantees that the
+// longest cycle of a piece not appearing is at most 13 blocks.
+//
+// In order to provide a 7-piece preview at all times, the array size is
+// doubled and segments of the array is shuffled as needed.
+
 #pragma once
 
-#include <mpe/randomizer/interface.hpp>
-#include <mpe/block.hpp>
 #include <algorithm>
 #include <numeric>
 #include <iostream>
 
+#include "mpe/randomizer/interface.hpp"
+#include "mpe/block.hpp"
+
 namespace mpe::randomizer {
 
+// This is fixed currently, but theoretically we could extend this bag type to
+// any multiple of 7 easily via templates.
 constexpr int N = 7;
 
-class Bag : public Randomizer
+class bag : public interface
 {
   public:
-    Bag() : m_index(0)
+    bag() : m_index(0)
     {
         shuffle(0);
         shuffle(N);
@@ -27,25 +40,24 @@ class Bag : public Randomizer
         std::shuffle(begin, end, m_generator);
     }
 
-    Block next()
+    block next()
     {
-        Block random_block = Block(m_bag[m_index]);
+        block random_block = block(m_bag[m_index]);
         m_index = (m_index + 1) % (2*N);
 
         if (m_index % N == 0) {
-            std::cout << "Shuffling m_index = " << m_index << "\n";
             shuffle(m_index);
         }
 
         return random_block;
     }
 
-    int previewCount() const
+    int preview_count() const
     {
         return N;
     }
 
-    std::vector<int> previewPieces()
+    std::vector<int> preview_pieces()
     {
         std::vector<int> previews;
         for (int i = 0; i < N; ++i)
@@ -56,7 +68,7 @@ class Bag : public Randomizer
 
   private:
     int m_index;
-    std::array<int, 2*N> m_bag;
+    std::array<rotation_type, 2*N> m_bag;
 };
 
 } /* mpe::namespace randomizer */

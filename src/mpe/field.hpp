@@ -1,34 +1,61 @@
+///
+// field.hpp
+//
+// Specifies a field which blocks can be played to.
+
 #pragma once
 
 #include <vector>
 
 namespace mpe {
 
-class Block;
+// Forward declare block
+class block;
 
-const int DEFAULT_WIDTH = 10;
+// Default width of field
+static constexpr int c_default_width = 10;
 
-const int DEFAULT_HEIGHT = 25;
+// Default height of field
+static constexpr int c_default_height = 25;
 
-class Field
+// Default hidden height of field
+static constexpr int c_default_hidden = 3;
+
+class field
 {
   public:
-    Field(int = DEFAULT_WIDTH, int = DEFAULT_HEIGHT);
 
-    int lineClear();
+    ///----------------
+    // Member Functions
+    ///---
+    field(const int w = c_default_width, const int h = c_default_height,
+          const int hh = c_default_hidden);
 
-    void placeBlock(const Block &block);
+    // Clear all lines on the field, returning the number cleared.
+    int line_clear();
 
-    int getCell(const int, const int) const;
+    // Fix a block into the current field.
+    void place_block(const block &block);
 
-    int getHeight() const;
+    // Return the status of the field at the specified co-ordinates
+    int at(const int x, const int y) const;
 
-    int getWidth() const;
+    ///----------------
+    // Member Variables
+    ///---
 
-  private:
+    // Width of the field
+    int width;
+
+    // Height of the field (excludes hidden rows)
+    int height;
+
+    // Number of hidden rows in field
+    int hidden;
+
+    // Store the contents of the field. This is store in a single-dimension
+    // array for allocator convenience. Field offsets are calculated manually.
     std::vector<int> m_data;
-    int m_w;
-    int m_h;
 };
 
 } /* namespace mpe */

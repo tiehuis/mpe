@@ -1,13 +1,20 @@
-#include <mpe/field.hpp>
-#include <mpe/block.hpp>
+#include <experimental/dynarray>
+
+#include "mpe/field.hpp"
+#include "mpe/block.hpp"
+#include "mpe/utiliy.hpp"
 
 namespace mpe {
 
-static const int INITIAL_X = 3;
+// The initial C position a block is spawned at
+static const int c_initial_x = 3;
 
-static const int INITIAL_Y = 21;
+// The initial Y position a block is spawned at
+static const int c_initial_y = 21;
 
-static const Point BLOCK_DATA[7][4][4] = {
+// Blocks are not necessarily composed of 4-pieces, so a dynarray is
+// a suitable container for storage, and is better than a vector.
+static const std::experimental::dynarray<point> c_block_data[7][4] = {
     /* I Block */
     {
         {{0, 1}, {1, 1}, {2, 1}, {3, 1}},
@@ -59,37 +66,37 @@ static const Point BLOCK_DATA[7][4][4] = {
     }
 };
 
-Block::Block(const int id, const int r)
+block::block(const block_type id, const rotation_type r)
 {
     m_id = id;
     m_r = r;
-    m_x = INITIAL_X;
-    m_y = INITIAL_Y;
+    m_x = c_initial_x;
+    m_y = c_initial_y;
     m_can_be_held = true;
     m_should_be_placed =false;
-    m_data = (Point*) BLOCK_DATA[m_id][m_r];
+    m_data = c_block_data[m_id][m_r];
 }
 
-bool Block::collision(const Field& field)
+bool Block::collision(const field& field)
 {
     for (int i = 0; i < 4; ++i) {
         const int x =  m_x + m_data[i].x;
         const int y =  m_y + m_data[i].y;
 
-        if (x >= field.getWidth() || x < 0)
+        if (x >= field.width || x < 0)
             return true;
 
         if (y < 0)
             return true;
 
-        if (field.getCell(x, y))
+        if (field.at(x, y))
             return true;
     }
 
     return false;
 }
 
-bool Block::moveLeft(const Field& field)
+bool block::move_left(const field& field)
 {
     m_x -= 1;
 
@@ -102,7 +109,7 @@ bool Block::moveLeft(const Field& field)
     }
 }
 
-bool Block::moveRight(const Field& field)
+bool block::move_right(const field& field)
 {
     m_x += 1;
 
@@ -115,7 +122,7 @@ bool Block::moveRight(const Field& field)
     }
 }
 
-bool Block::moveDown(const Field& field)
+bool block::move_down(const dield& field)
 {
     m_y -= 1;
 
@@ -128,7 +135,7 @@ bool Block::moveDown(const Field& field)
     }
 }
 
-bool Block::moveN(const Field& field, const int x, const int y)
+bool block::move_n(const field& field, const int x, const int y)
 {
     m_x += x;
     m_y += y;
@@ -143,10 +150,10 @@ bool Block::moveN(const Field& field, const int x, const int y)
     }
 }
 
-bool Block::rotateRight(const Field& field, const int x, const int y)
+bool block::rotate_right(const field& field, const int x, const int y)
 {
-    m_r = (m_r + 3) % 4;
-    m_data = (Point*) (BLOCK_DATA[m_id][m_r]);
+    m_r = rotation_clockwise(m_r);
+    m_data = c_block_data[m_id][m_r];
     m_x += x;
     m_y += y;
 
@@ -154,19 +161,19 @@ bool Block::rotateRight(const Field& field, const int x, const int y)
         return true;
     }
     else {
-        m_r = (m_r + 1) % 4;
-        m_data = (Point*) (BLOCK_DATA[m_id][m_r]);
+        m_r = rotation_anticlockwise(m_r);
+        m_data = (Point*) (c_block_data[m_id][m_r]);
         m_x -= x;
         m_y -= y;
         return false;
     }
 }
 
-bool Block::rotateRight(const Field& field, const wallkick::Wallkick &wt)
+bool block::rotate_right(const field& field, const wallkick::wallkick &wt)
 {
     for (int test = 0; test < wt.count(m_id); ++test) {
-        const wallkick::Result wr = wt.right(m_id, m_r, test);
-        if (rotateRight(field, wr.x, wr.y)) {
+        const wallkick::result wr = wt.right(m_id, m_r, test);
+        if (rotate_right(field, wr.x, wr.y)) {
             return true;
         }
     }
@@ -174,10 +181,10 @@ bool Block::rotateRight(const Field& field, const wallkick::Wallkick &wt)
     return false;
 }
 
-bool Block::rotateLeft(const Field& field, const int x, const int y)
+bool block::rotate_left(const field& field, const int x, const int y)
 {
-    m_r = (m_r + 1) % 4;
-    m_data = (Point*) (BLOCK_DATA[m_id][m_r]);
+    m_r = rotate_anticlockwise(m_r);
+    m_data = c_block_data[m_id][m_r];
     m_x += x;
     m_y += y;
 
@@ -185,19 +192,19 @@ bool Block::rotateLeft(const Field& field, const int x, const int y)
         return true;
     }
     else {
-        m_r = (m_r + 3) % 4;
-        m_data = (Point*) (BLOCK_DATA[m_id][m_r]);
+        m_r = rotate_clockwise(m_r);
+        m_data = c_block_data[m_id][m_r];
         m_x -= x;
         m_y -= y;
         return false;
     }
 }
 
-bool Block::rotateLeft(const Field& field, const wallkick::Wallkick &wt)
+bool block::rotate_left(const field& field, const wallkick::wallkick &wt)
 {
     for (int test = 0; test < wt.count(m_id); ++test) {
-        const wallkick::Result wr = wt.left(m_id, m_r, test);
-        if (rotateLeft(field, wr.x, wr.y)) {
+        const wallkick::result wr = wt.left(m_id, m_r, test);
+        if (rotate_left(field, wr.x, wr.y)) {
             return true;
         }
     }
@@ -205,13 +212,13 @@ bool Block::rotateLeft(const Field& field, const wallkick::Wallkick &wt)
     return false;
 }
 
-void Block::hardDrop(const Field& field)
+void block::hard_drop(const field& field)
 {
-    while (moveDown(field)) {}
+    while (move_down(field)) {}
     m_should_be_placed = true;
 }
 
-bool Block::isSet(const int x, const int y) const
+bool block::at(const int x, const int y) const
 {
     for (int i = 0; i < 4; ++i) {
         const int bx =  m_x + m_data[i].x;
