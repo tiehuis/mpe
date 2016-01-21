@@ -58,9 +58,9 @@ class engine {
             block.move_down(field);
 
         if (keystate.is_pushed(keycode::z))
-            block.rotate_left(field, *wallkick);
-        else if (keystate.is_pushed(keycode::x))
             block.rotate_right(field, *wallkick);
+        else if (keystate.is_pushed(keycode::x))
+            block.rotate_left(field, *wallkick);
 
         if (keystate.is_pressed(keycode::c) && block.can_be_held) {
             if (!hold) {
