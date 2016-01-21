@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <mpe/block.hpp>
 #include <random>
-#include <iostream>
+
+#include "mpe/block.hpp"
 
 namespace mpe::randomizer {
 
@@ -22,7 +22,7 @@ class interface
     virtual block next() = 0;
 
     // Return the maximum number of preview pieces that can be shown
-    virtual int previewCount() const = 0;
+    virtual int preview_count() const = 0;
 
     // Return a vector of the next incoming pieces. The length of this vector
     // will be the size returned by previewCount
@@ -33,17 +33,17 @@ class interface
     // randomizer to have access to a 0-6 int distribution.
     interface() {
         std::random_device rd;
-        m_generator = std::mt19937(rd());
-        m_dist = std::uniform_int_distribution<int>(0, 6);
+        generator = std::mt19937(rd());
+        dist = std::uniform_int_distribution<int>(0, 6);
     }
 
     // Return a random block. This cannot be overriden by base classes.
     virtual block random_block() final {
-        return block(m_dist(m_generator));
+        return ::mpe::block(static_cast<::mpe::block_type>(dist(generator)));
     }
 
-    std::mt19937 m_generator;
-    std::uniform_int_distribution<int> m_dist;
+    std::mt19937 generator;
+    std::uniform_int_distribution<int> dist;
 };
 
 } /* mpe::namespace randomizer */

@@ -2,6 +2,8 @@
 #include <ratio>
 #include <thread>
 
+#include <stdio.h>
+
 #include "mpe/engine.hpp"
 #include "mpe/ui.hpp"
 
@@ -10,13 +12,13 @@ constexpr int framerate = 60;
 
 // Tick rate specifies the number of engine updates per second. Tickrates
 // should be a multiple of the framerate to mean anything.
-constexpr int tickrate = 2 * framerate;
+constexpr int tickrate = framerate;
 
 // It makes no sense for tickrate to be less than framerate
-static_assert(tickrate > framerate);
+static_assert(tickrate >= framerate);
 
 // Define the duration of a single tick
-constexpr std::chrono::duration<int, std::ratio<1, framerate>> time(1);
+constexpr std::chrono::duration<int, std::ratio<1, tickrate>> ticktime(1);
 
 int main(void)
 {
@@ -24,10 +26,10 @@ int main(void)
     mpe::ui ui(framerate);
 
     while (engine.running) {
-        auto next_time_point = std::chrono::steady_clock::now() + frametime;
+        auto next_time_point = std::chrono::steady_clock::now() + ticktime;
 
         // Limit draw phase to 60 frames regardless of internal tick counter
-        if (engine.ticks % (tickrate / framerate)) {
+        if (engine.ticks % (tickrate / framerate) == 0) {
             // Render current game status
             ui.render(engine);
 

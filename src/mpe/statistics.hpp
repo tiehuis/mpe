@@ -26,7 +26,7 @@ struct frame_statistics
 
     // The current finesse this game
     int finesse;
-}
+};
 
 ///
 // Specifies a statistic object which tracks progress over an entire game.
@@ -38,6 +38,6 @@ struct statistics : public frame_statistics
         blocks_placed += fstat.blocks_placed;
         lines_cleared += fstat.lines_cleared;
     }
-}
+};
 
 } // namespace mpe

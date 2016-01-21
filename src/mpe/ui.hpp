@@ -9,40 +9,43 @@
 // but this information should be left to the ui to display. If this could be
 // down in a rule-agnostic way that would be ideal.
 
+#pragma once
+
 #include <array>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
 #include "mpe/engine.hpp"
 #include "mpe/keystate.hpp"
+#include "mpe/utility.hpp"
 
 namespace mpe {
 
-#pragma once
-
 struct key {
     sf::Keyboard::Key code;
-    keycode index;
+    mpe::keycode index;
 };
 
 // Specifies a mapping between sfml keyboard event types and internal keycodes
 // which are used as indices.
-static constexpr std::array<key, 8> keymap = {
-    { sf::Keyboard::Left, mpe::keystate::left },
-    { sf::Keyboard::Right, mpe::keystate::right },
-    { sf::Keyboard::Down, mpe::keystate::down },
-    { sf::Keyboard::Up, mpe::keystate::up },
-    { sf::Keyboard::Z, mpe::keystate::z },
-    { sf::Keyboard::X, mpe::keystate::x },
-    { sf::Keyboard::C, mpe::keystate::c }
-}
+static constexpr std::array<key, mpe::keycode_length> keymap = {{
+    { sf::Keyboard::Left, mpe::keycode::left },
+    { sf::Keyboard::Right, mpe::keycode::right },
+    { sf::Keyboard::Down, mpe::keycode::down },
+    { sf::Keyboard::Up, mpe::keycode::up },
+    { sf::Keyboard::Space, mpe::keycode::space },
+    { sf::Keyboard::Z, mpe::keycode::z },
+    { sf::Keyboard::X, mpe::keycode::x },
+    { sf::Keyboard::Q, mpe::keycode::q },
+    { sf::Keyboard::C, mpe::keycode::c }
+}};
 
 class ui
 {
-  public
-    ui(int framerate)
+  public:
+    // RenderWindow has no copy constructor
+    ui(int framerate) : window(sf::VideoMode(800, 600), "mptet")
     {
-        window = sf::RenderWindow(sf::VideoMode(800, 600), "mptet");
         window.setFramerateLimit(framerate);
     }
 
@@ -54,7 +57,7 @@ class ui
     // Update the currently set keys
     void update(mpe::engine &engine)
     {
-        for (key& : keymap) {
+        for (auto key : keymap) {
             if (sf::Keyboard::isKeyPressed(key.code))
                 engine.keystate.key_down(key.index);
             else
@@ -65,9 +68,9 @@ class ui
     void render(const mpe::engine &engine)
     {
         window.clear(sf::Color::Black);
-        render_field();
-        render_preview();
-        render_hold();
+        render_field(engine);
+        render_preview(engine);
+        render_hold(engine);
         window.display();
     }
 
@@ -102,15 +105,15 @@ class ui
         }
     }
 
-    void render_preview(const mpe::engine &engine);
+    void render_preview(const mpe::engine &engine) {}
 
-    void render_hold(const mpe::engine &engine);
+    void render_hold(const mpe::engine &engine) {}
 
     ///----------------
     // Member Variables
     ///---
 
     sf::RenderWindow window;
-}
+};
 
 } // namespace mpe

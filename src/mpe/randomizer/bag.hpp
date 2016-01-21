@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <numeric>
-#include <iostream>
 
 #include "mpe/randomizer/interface.hpp"
 #include "mpe/block.hpp"
@@ -26,7 +25,7 @@ constexpr int N = 7;
 class bag : public interface
 {
   public:
-    bag() : m_index(0)
+    bag() : index(0)
     {
         shuffle(0);
         shuffle(N);
@@ -34,19 +33,19 @@ class bag : public interface
 
     void shuffle(const int start)
     {
-        auto begin = start ? m_bag.begin() : m_bag.begin() + N;
-        auto end   = start ? m_bag.begin() + N : m_bag.end();
+        auto begin = start ? data.begin() : data.begin() + N;
+        auto end   = start ? data.begin() + N : data.end();
         std::iota(begin, end, 0);
-        std::shuffle(begin, end, m_generator);
+        std::shuffle(begin, end, generator);
     }
 
     block next()
     {
-        block random_block = block(m_bag[m_index]);
-        m_index = (m_index + 1) % (2*N);
+        block random_block = block(static_cast<block_type>(data[index]));
+        index = (index + 1) % (2*N);
 
-        if (m_index % N == 0) {
-            shuffle(m_index);
+        if (index % N == 0) {
+            shuffle(index);
         }
 
         return random_block;
@@ -61,14 +60,14 @@ class bag : public interface
     {
         std::vector<int> previews;
         for (int i = 0; i < N; ++i)
-            previews.push_back(m_bag[(m_index + i) % (2*N)]);
+            previews.push_back(data[(index + i) % (2*N)]);
 
         return previews;
     }
 
   private:
-    int m_index;
-    std::array<rotation_type, 2*N> m_bag;
+    int index;
+    std::array<rotation_type, 2*N> data;
 };
 
 } /* mpe::namespace randomizer */

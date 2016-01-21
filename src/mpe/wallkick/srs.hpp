@@ -49,7 +49,7 @@ class SRS : public interface
 
     result left(const int id, const int br, const int test) const
     {
-        if (id == mpe::block::I)
+        if (id == 0)
             return d_left_I[br][test];
         else
             return d_left_JLSTZ[br][test];
@@ -57,7 +57,7 @@ class SRS : public interface
 
     result right(const int id, const int br, const int test) const
     {
-        if (id == mpe::block::I)
+        if (id == 0)
             return d_right_I[br][test];
         else
             return d_right_JLSTZ[br][test];

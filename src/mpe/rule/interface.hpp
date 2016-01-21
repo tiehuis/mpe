@@ -13,7 +13,7 @@ class interface
 {
   public:
     // Virtual destructor
-    virtual ~interface() = 0;
+    virtual ~interface() {}
 
     // Return true if the end condition was satisfied. This isn't the only
     // way to finish a game, but only rule-specific end conditions are
@@ -22,6 +22,6 @@ class interface
 
     // Update the current rule with the given frame_statistics object.
     virtual void update(const frame_statistics &fstat) = 0;
-}
+};
 
 } // namespace rule

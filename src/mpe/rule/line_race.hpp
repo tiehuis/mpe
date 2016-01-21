@@ -11,32 +11,32 @@
 
 namespace mpe::rule {
 
-class line_race
+class line_race : public interface
 {
   public:
     ///----------------
     // Member Functions
     ///---
 
-    line_race(int goal = 40) : m_goal(goal), m_cleared(0) {}
+    line_race(const int goal = 40) : goal(goal), cleared(0) {}
 
     bool end_condition() const
     {
-        return m_cleared >= m_goal;
+        return cleared >= goal;
     }
 
     void update(const frame_statistics &fstat)
     {
-        m_cleared += fstat.lines_cleared;
+        cleared += fstat.lines_cleared;
     }
 
     ///----------------
     // Member Variables
     ///---
 
-    int m_goal;
+    int goal;
 
-    int m_cleared;
-}
+    int cleared;
+};
 
 } // namespace rule

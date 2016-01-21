@@ -23,6 +23,6 @@ class option
     int das;
 
     int are;
-}
+};
 
 } // namespace mpe

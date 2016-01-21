@@ -55,7 +55,7 @@ class field
 
     // Store the contents of the field. This is store in a single-dimension
     // array for allocator convenience. Field offsets are calculated manually.
-    std::vector<int> m_data;
+    std::vector<int> data;
 };
 
-} /* namespace mpe */
+} // namespace mpe

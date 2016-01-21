@@ -2,18 +2,24 @@
 // keystate.hpp
 //
 // Specifies the state of a set of restricted inputs.
+//
+// Improvements:
+//  - There are quite a few enum_casts here. It isn't too bad, but it would be
+//    nice if there were a cleaner alternative.
 
 #pragma once
 
 #include <algorithm>
 #include <array>
 
+#include "mpe/utility.hpp"
+
 namespace mpe {
 
-class enum keycode {
-    left, right, up, down, z, x, c, space,
-    length // Number of elements in enum
-}
+enum keycode {
+    left, right, up, down, z, x, c, q, space,
+    keycode_length
+};
 
 class keystate
 {
@@ -41,25 +47,25 @@ class keystate
     // Update all key timings
     void update_all(void)
     {
-        for (auto &key : m_keytimes) {
-            if (m_keydown[key])
-                key++;
+        for (int i = 0; i < keycode_length; ++i) {
+            if (m_keydown[i])
+                m_keytimes[i]++;
             else
-                key = 0;
+                m_keytimes[i] = 0;
         }
     }
 
     // Return whether a key was pushed.
     // A key can only be pushed once on each key down event. If the key is
     // held down, this will return false on successive calls.
-    void is_pushed(const keycode key)
+    bool is_pushed(const keycode key)
     {
         return m_keytimes[key] == 1;
     }
 
     // Return whether a key is pressed.
     // A key is pressed if it is in the down state.
-    void is_pressed(const keycode key)
+    bool is_pressed(const keycode key)
     {
         return m_keytimes[key] >= 1;
     }
@@ -67,9 +73,10 @@ class keystate
     // Return whether a key is pushed, or has been down longer than the
     // specified length of time. This is particularly useful for das
     // calculations.
-    void is_pressed_with_das(const keycode key, const int das)
+    bool is_pressed_with_das(const keycode key, const int das)
     {
-        return m_keytimes[key] == 1 || m_keytimes > das;
+        return m_keytimes[key] == 1 ||
+               m_keytimes[key] > das;
     }
 
     ///----------------
@@ -79,10 +86,10 @@ class keystate
     // Store the status of keys:
     //  - false => up
     //  - true  => down
-    std::array<bool, keycode::length> m_keydown;
+    std::array<bool, keycode_length> m_keydown;
 
     // Store how long each key has been pressed for in terms of ticks
-    std::array<int, keycode::length> m_keytimes;
+    std::array<int, keycode_length> m_keytimes;
 };
 
 } // namespace mpe

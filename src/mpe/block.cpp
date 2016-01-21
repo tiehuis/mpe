@@ -1,8 +1,8 @@
-#include <experimental/dynarray>
+#include <vector>
 
 #include "mpe/field.hpp"
 #include "mpe/block.hpp"
-#include "mpe/utiliy.hpp"
+#include "mpe/utility.hpp"
 
 namespace mpe {
 
@@ -14,7 +14,7 @@ static const int c_initial_y = 21;
 
 // Blocks are not necessarily composed of 4-pieces, so a dynarray is
 // a suitable container for storage, and is better than a vector.
-static const std::experimental::dynarray<point> c_block_data[7][4] = {
+static const std::vector<point> c_block_data[7][4] = {
     /* I Block */
     {
         {{0, 1}, {1, 1}, {2, 1}, {3, 1}},
@@ -67,112 +67,108 @@ static const std::experimental::dynarray<point> c_block_data[7][4] = {
 };
 
 block::block(const block_type id, const rotation_type r)
+    : x(c_initial_x), y(c_initial_y), id(id), r(r)
 {
-    m_id = id;
-    m_r = r;
-    m_x = c_initial_x;
-    m_y = c_initial_y;
-    m_can_be_held = true;
-    m_should_be_placed =false;
-    m_data = c_block_data[m_id][m_r];
+    can_be_held = true;
+    data = c_block_data[id][r];
 }
 
-bool Block::collision(const field& field)
+bool block::collision(const field &field)
 {
-    for (int i = 0; i < 4; ++i) {
-        const int x =  m_x + m_data[i].x;
-        const int y =  m_y + m_data[i].y;
+    for (int i = 0; i < data.size(); ++i) {
+        const int xoffset =  x + data[i].x;
+        const int yoffset =  y + data[i].y;
 
-        if (x >= field.width || x < 0)
+        if (xoffset >= field.width || xoffset < 0)
             return true;
 
-        if (y < 0)
+        if (yoffset < 0)
             return true;
 
-        if (field.at(x, y))
+        if (field.at(xoffset, yoffset))
             return true;
     }
 
     return false;
 }
 
-bool block::move_left(const field& field)
+bool block::move_left(const field &field)
 {
-    m_x -= 1;
+    x -= 1;
 
     if (!collision(field)) {
         return true;
     }
     else {
-        m_x += 1;
+        x += 1;
         return false;
     }
 }
 
-bool block::move_right(const field& field)
+bool block::move_right(const field &field)
 {
-    m_x += 1;
+    x += 1;
 
     if (!collision(field)) {
         return true;
     }
     else {
-        m_x -= 1;
+        x -= 1;
         return false;
     }
 }
 
-bool block::move_down(const dield& field)
+bool block::move_down(const field &field)
 {
-    m_y -= 1;
+    y -= 1;
 
     if (!collision(field)) {
         return true;
     }
     else {
-        m_y += 1;
+        y += 1;
         return false;
     }
 }
 
-bool block::move_n(const field& field, const int x, const int y)
+bool block::move_n(const field& field, const int xl, const int yl)
 {
-    m_x += x;
-    m_y += y;
+    x += xl;
+    y += yl;
 
     if (!collision(field)) {
         return true;
     }
     else {
-        m_x -= x;
-        m_y -= y;
+        x -= xl;
+        y -= yl;
         return false;
     }
 }
 
-bool block::rotate_right(const field& field, const int x, const int y)
+bool block::rotate_right(const field &field, const int xl, const int yl)
 {
-    m_r = rotation_clockwise(m_r);
-    m_data = c_block_data[m_id][m_r];
-    m_x += x;
-    m_y += y;
+    r = rotate_clockwise(r);
+    data = c_block_data[id][r];
+    x += xl;
+    y += yl;
 
     if (!collision(field)) {
         return true;
     }
     else {
-        m_r = rotation_anticlockwise(m_r);
-        m_data = (Point*) (c_block_data[m_id][m_r]);
-        m_x -= x;
-        m_y -= y;
+        r = rotate_anticlockwise(r);
+        data = c_block_data[id][r];
+        x -= xl;
+        y -= yl;
         return false;
     }
 }
 
-bool block::rotate_right(const field& field, const wallkick::wallkick &wt)
+bool block::rotate_right(const field &field, const wallkick::interface &wt)
 {
-    for (int test = 0; test < wt.count(m_id); ++test) {
-        const wallkick::result wr = wt.right(m_id, m_r, test);
+    for (int test = 0; test < wt.count(id); ++test) {
+        const wallkick::result wr = wt.right(id, r, test);
         if (rotate_right(field, wr.x, wr.y)) {
             return true;
         }
@@ -181,29 +177,29 @@ bool block::rotate_right(const field& field, const wallkick::wallkick &wt)
     return false;
 }
 
-bool block::rotate_left(const field& field, const int x, const int y)
+bool block::rotate_left(const field &field, const int xl, const int yl)
 {
-    m_r = rotate_anticlockwise(m_r);
-    m_data = c_block_data[m_id][m_r];
-    m_x += x;
-    m_y += y;
+    r = rotate_anticlockwise(r);
+    data = c_block_data[id][r];
+    x += xl;
+    y += yl;
 
     if (!collision(field)) {
         return true;
     }
     else {
-        m_r = rotate_clockwise(m_r);
-        m_data = c_block_data[m_id][m_r];
-        m_x -= x;
-        m_y -= y;
+        r = rotate_clockwise(r);
+        data = c_block_data[id][r];
+        x -= xl;
+        y -= yl;
         return false;
     }
 }
 
-bool block::rotate_left(const field& field, const wallkick::wallkick &wt)
+bool block::rotate_left(const field &field, const wallkick::interface &wt)
 {
-    for (int test = 0; test < wt.count(m_id); ++test) {
-        const wallkick::result wr = wt.left(m_id, m_r, test);
+    for (int test = 0; test < wt.count(id); ++test) {
+        const wallkick::result wr = wt.left(id, r, test);
         if (rotate_left(field, wr.x, wr.y)) {
             return true;
         }
@@ -212,23 +208,22 @@ bool block::rotate_left(const field& field, const wallkick::wallkick &wt)
     return false;
 }
 
-void block::hard_drop(const field& field)
+void block::hard_drop(const field &field)
 {
     while (move_down(field)) {}
-    m_should_be_placed = true;
 }
 
-bool block::at(const int x, const int y) const
+bool block::at(const int xl, const int yl) const
 {
-    for (int i = 0; i < 4; ++i) {
-        const int bx =  m_x + m_data[i].x;
-        const int by =  m_y + m_data[i].y;
+    for (int i = 0; i < data.size(); ++i) {
+        const int bx =  x + data[i].x;
+        const int by =  y + data[i].y;
 
-        if (bx == x && by == y)
+        if (bx == xl && by == yl)
             return true;
     }
 
     return false;
 }
 
-} /* namespace mpe */
+} // namespace mpe
