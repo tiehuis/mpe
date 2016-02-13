@@ -39,6 +39,31 @@ class engine {
         option     = mpe::option();
     }
 
+    void update_move() {
+        // Move in the direction that has been pressed the longest
+        //
+        // Need to implement DasRepeat and InitialDas
+        //
+        if (keystate.m_keytimes[keycode::left] < keystate.m_keytimes[keycode::right]) {
+            if (keystate.is_pressed_with_das(keycode::right, option.das)) {
+                block.move_right(field);
+            }
+        }
+        else {
+            if (keystate.is_pressed_with_das(keycode::left, option.das)) {
+                block.move_left(field);
+            }
+        }
+
+        if (keystate.is_pressed_with_das(keycode::down, option.das))
+            block.move_down(field);
+
+        if (keystate.is_pushed(keycode::z))
+            block.rotate_left(field, *wallkick);
+        else if (keystate.is_pushed(keycode::x))
+            block.rotate_right(field, *wallkick);
+    }
+
     // Perform an update cycle based on the current keystate
     // It would be nice if this was abstracted away slightly.
     void update() {
@@ -49,18 +74,9 @@ class engine {
         // While we know the current keystate, we need to update the timings
         keystate.update_all();
 
-        if (keystate.is_pressed_with_das(keycode::left, option.das))
-            block.move_left(field);
-        else if (keystate.is_pressed_with_das(keycode::right, option.das))
-            block.move_right(field);
-
-        if (keystate.is_pressed_with_das(keycode::down, option.das))
-            block.move_down(field);
-
-        if (keystate.is_pushed(keycode::z))
-            block.rotate_right(field, *wallkick);
-        else if (keystate.is_pushed(keycode::x))
-            block.rotate_left(field, *wallkick);
+        // We may need to perform a move multiple times in one frame, depending
+        // on the current DAS state.
+        update_move();
 
         if (keystate.is_pressed(keycode::c) && block.can_be_held) {
             if (!hold) {

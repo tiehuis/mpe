@@ -3,20 +3,55 @@
 
 #include "test.hpp"
 
-using namespace mpe;
+static mpe::block block;
+static mpe::field field;
 
-void test1()
+#define TEST_FUNCTION(x, y, fn)                     \
+do {                                                \
+    const mpe::test::field_state _istate = {{ x }}; \
+    const mpe::test::field_state _fstate = {{ y }}; \
+    mpe::test::set_state(field, block, _istate);    \
+    fn;                                             \
+    mpe::test::assert_state(field, block, _fstate); \
+} while (0)
+
+///
+// Lineclear function tests
+void t1()
 {
+    TEST_FUNCTION(
+        "##########",
 
-    initial_state = {{
+        "          ",
+
+        field.line_clear()
+    );
+}
+
+void t2()
+{
+    TEST_FUNCTION(
         "#########"
-    }};
+        "### #####"
+        " ########"
 
-    end_state = {{
+        "#########",
         "         "
-    }};
+        "#########"
+        "#########",
 
-    test::set_block(field, block, initial_state);
-    field.line_clear();
-    test::assert_state(field, block, end_state);
+        field.line_clear()
+    );
+}
+
+///
+// Rotaton function tests
+
+///
+// T-spin rotation tests
+
+int main(void)
+{
+    t1();
+    t2();
 }

@@ -12,6 +12,7 @@
 #pragma once
 
 #include <array>
+#include <algorithm>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
@@ -105,7 +106,22 @@ class ui
         }
     }
 
-    void render_preview(const mpe::engine &engine) {}
+    void render_preview(const mpe::engine &engine)
+    {
+        auto pieces = engine.randomizer->preview_pieces();
+        sf::RectangleShape rfill(sf::Vector2f(15, 15));
+
+        int iy = 100;
+        int ix = 450;
+
+        for (int i = 0; i < std::min(engine.randomizer->preview_count(), 4); ++i) {
+            mpe::block pb(pieces[i]);
+            for (int j = 0; j < 4; ++j) {
+                rfill.setPosition(ix + pb.data[j].x * 15, iy + i * 5 * 15 - pb.data[j].y * 15);
+                window.draw(rfill);
+            }
+        }
+    }
 
     void render_hold(const mpe::engine &engine) {}
 
