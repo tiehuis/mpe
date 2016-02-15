@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstdio>
+
 namespace mpe {
 
 ///
@@ -50,6 +52,17 @@ struct statistics
         blocks_placed += fstat.blocks_placed;
         lines_cleared += fstat.lines_cleared;
         frames_elapsed += 1;
+    }
+
+    // Dump the current statistics object to the specified stream
+    void dump(FILE *fd = stdout) const
+    {
+        std::printf("Blocks Placed: %d\n", blocks_placed);
+        std::printf("Lines Cleared: %d\n", lines_cleared);
+
+        const float time_elapsed = frames_elapsed * 16.66f / 1000;
+        std::printf("Time: %.4fs\n", time_elapsed);
+        std::printf("PPS: %.4fs\n", blocks_placed / time_elapsed);
     }
 
     // The current finesse this game

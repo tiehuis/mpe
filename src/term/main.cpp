@@ -49,6 +49,5 @@ int main(void)
         }
     }
 
-    const float ms = engine.statistics.frames_elapsed * 16.66f / 1000;
-    std::printf("Time: %lf\n", ms);
+    engine.statistics.dump();
 }

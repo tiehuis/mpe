@@ -206,11 +206,15 @@ class ui
     {
         const int ya = height / 2 - engine.field.height + 4;
 
-        mvprintw(ya, ix, "Lines Cleared: %d", engine.statistics.lines_cleared);
+        mvprintw(ya + 0, ix, "Blocks Placed: %d", engine.statistics.blocks_placed);
 
-        // Calculate the time elapsed so far
-        const float ms = engine.statistics.frames_elapsed * 16.66f / 1000;
-        mvprintw(ya + 2, ix, "Time: %.4fs", ms);
+        mvprintw(ya + 2, ix, "Lines Cleared: %d", engine.statistics.lines_cleared);
+
+        const float time_elapsed = engine.statistics.frames_elapsed * 16.66f / 1000;
+        mvprintw(ya + 4, ix, "Time: %.4fs", time_elapsed);
+
+        const float pps = engine.statistics.blocks_placed / time_elapsed;
+        mvprintw(ya + 6, ix, "PPS: %.4fs", pps);
     }
 
     ///----------------

@@ -65,7 +65,7 @@ class engine {
             }
         }
 
-        if (keystate.is_pressed_with_das(keycode::down, option.das))
+        if (keystate.is_pressed(keycode::down))
             block.move_down(field);
 
         if (keystate.is_pushed(keycode::z))
@@ -104,6 +104,7 @@ class engine {
         if (keystate.is_pushed(keycode::space)) {
             block.hard_drop(field);
             field.place_block(block);
+            fstat.blocks_placed += 1;
             fstat.lines_cleared += field.line_clear();
             block = randomizer->next();
         }
