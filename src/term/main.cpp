@@ -2,6 +2,7 @@
 #include <ratio>
 #include <thread>
 
+#include <cstdio>
 #include <clocale>
 #include <mpe/engine.hpp>
 
@@ -24,25 +25,30 @@ int main(void)
 {
     // Important to call this before the ui constructor
     std::setlocale(LC_ALL, "");
-
     mpe::engine engine;
-    mpe::ui ui;
 
-    while (engine.running) {
-        auto next_time_point = std::chrono::steady_clock::now() + ticktime;
+    {
+        mpe::ui ui;
 
-        // Limit draw phase to 60 frames regardless of internal tick counter
-        if (engine.ticks % (tickrate / framerate) == 0) {
-            // Render current game status
-            ui.render(engine);
+        while (engine.running) {
+            auto next_time_point = std::chrono::steady_clock::now() + ticktime;
 
-            // Update engine keys
-            ui.update(engine);
+            // Limit draw phase to 60 frames regardless of internal tick counter
+            if (engine.ticks % (tickrate / framerate) == 0) {
+                // Render current game status
+                ui.render(engine);
+
+                // Update engine keys
+                ui.update(engine);
+            }
+
+            // Process game tick
+            engine.update();
+
+            std::this_thread::sleep_until(next_time_point);
         }
-
-        // Process game tick
-        engine.update();
-
-        std::this_thread::sleep_until(next_time_point);
     }
+
+    const float ms = engine.statistics.frames_elapsed * 16.66f / 1000;
+    std::printf("Time: %lf\n", ms);
 }

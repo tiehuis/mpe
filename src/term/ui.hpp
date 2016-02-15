@@ -51,6 +51,7 @@ class ui
     {
         initscr();
         curs_set(0);
+        timeout(0);
         if (has_colors())
             start_color();
 
@@ -78,6 +79,8 @@ class ui
 
     ~ui()
     {
+        // Read all buffered input so it isn't dumped on exit
+        while (getch() != ERR) {}
         endwin();
     }
 
@@ -204,6 +207,10 @@ class ui
         const int ya = height / 2 - engine.field.height + 4;
 
         mvprintw(ya, ix, "Lines Cleared: %d", engine.statistics.lines_cleared);
+
+        // Calculate the time elapsed so far
+        const float ms = engine.statistics.frames_elapsed * 16.66f / 1000;
+        mvprintw(ya + 2, ix, "Time: %.4fs", ms);
     }
 
     ///----------------
