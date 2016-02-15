@@ -2,10 +2,10 @@
 #include <ratio>
 #include <thread>
 
-#include <stdio.h>
+#include <clocale>
+#include <mpe/engine.hpp>
 
-#include "mpe/engine.hpp"
-#include "mpe/ui.hpp"
+#include "ui.hpp"
 
 // Frame rate specifies the number of frame updates per second
 constexpr int framerate = 60;
@@ -22,8 +22,11 @@ constexpr std::chrono::duration<int, std::ratio<1, tickrate>> ticktime(1);
 
 int main(void)
 {
+    // Important to call this before the ui constructor
+    std::setlocale(LC_ALL, "");
+
     mpe::engine engine;
-    mpe::ui ui(framerate);
+    mpe::ui ui;
 
     while (engine.running) {
         auto next_time_point = std::chrono::steady_clock::now() + ticktime;

@@ -35,8 +35,8 @@ struct statistics
 {
     statistics() :
         finesse(0),
-        current_speed(0),
         blocks_placed(0),
+        current_speed(0),
         pps(0),
         ppm(0),
         frames_elapsed(0),
@@ -49,13 +49,14 @@ struct statistics
     {
         blocks_placed += fstat.blocks_placed;
         lines_cleared += fstat.lines_cleared;
+        frames_elapsed += 1;
     }
-
-    // How many blocks have been placed this frame
-    int blocks_placed;
 
     // The current finesse this game
     int finesse;
+
+    // How many blocks have been placed this frame
+    int blocks_placed;
 
     // Current speed (window)
     double current_speed;

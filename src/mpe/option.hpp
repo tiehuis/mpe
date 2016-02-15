@@ -20,9 +20,9 @@ class option
     // Member Variables
     ///---
 
-    int das;
-
     int are;
+
+    int das;
 };
 
 } // namespace mpe

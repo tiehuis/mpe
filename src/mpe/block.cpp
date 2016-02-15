@@ -75,7 +75,7 @@ block::block(const block_type id, const rotation_type r)
 
 bool block::collision(const field &field)
 {
-    for (int i = 0; i < data.size(); ++i) {
+    for (size_t i = 0; i < data.size(); ++i) {
         const int xoffset =  x + data[i].x;
         const int yoffset =  y + data[i].y;
 
@@ -215,7 +215,7 @@ void block::hard_drop(const field &field)
 
 bool block::at(const int xl, const int yl) const
 {
-    for (int i = 0; i < data.size(); ++i) {
+    for (size_t i = 0; i < data.size(); ++i) {
         const int bx =  x + data[i].x;
         const int by =  y + data[i].y;
 

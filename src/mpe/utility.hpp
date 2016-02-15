@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <string>
 #include <type_traits>
 
 namespace mpe {
@@ -22,5 +24,12 @@ constexpr typename std::underlying_type<T>::type enum_cast(T t)
 {
     return static_cast<typename std::underlying_type<T>::type>(t);
 }
+
+// A macro to calculate at compile-time the directory of the current file
+#define MPE_COMPILE_TIME_CURRENT_DIR                              \
+({                                                                \
+    std::string current_path(__FILE__);                           \
+    current_path.substr(0, current_path.find_last_of("/")) + "/"; \
+})
 
 } // namespace mpe

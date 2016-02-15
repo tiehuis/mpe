@@ -21,9 +21,13 @@ typedef int block_type;
 
 typedef int rotation_type;
 
-//enum block_type {
-//    I, T, L, J, S, Z, O,
-//};
+#define bI 1
+#define bT 2
+#define bL 3
+#define bJ 4
+#define bS 5
+#define bZ 6
+#define bO 7
 
 //enum rotation_type {
 //    _0, _90, _180, _270

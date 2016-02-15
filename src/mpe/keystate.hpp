@@ -18,7 +18,7 @@ namespace mpe {
 
 enum keycode {
     left, right, up, down, z, x, c, q, space,
-    keycode_length
+    keycode_length,
 };
 
 class keystate
