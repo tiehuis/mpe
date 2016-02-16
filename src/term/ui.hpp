@@ -71,7 +71,7 @@ class ui
         init_pair(4, bJ, 0);
         init_pair(5, bS, 0);
         init_pair(6, bZ, 0);
-        init_pair(7, bO, 0);
+        init_pair(7, bI, 0); // White blocks are not rendered properly by ncurses
 
         // Get size of screen
         getmaxyx(stdscr, height, width);
