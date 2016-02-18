@@ -37,9 +37,14 @@ static bool is_set(const field_state &state, int &value, const int x, const int 
 // We note that we always iterate from the bottom row, upwards from the left.
 // This allows us to assume our start position block and try a simple algorithm
 // to eliminate non-matches.
-int determine_block_id(const field_state &state, const int x, const int y)
+std::experimental::optional<mpe::block>
+determine_block(const field_state &state, const int x, const int y)
 {
-    int explicit_rotation = -1;
+    using std::experimental::optional;
+
+    // An explicit rotation specifier. This is required to avoid ambiguity in
+    // some specific cases where we cannot determine rotation.
+    int er = -1;
 
 #define IB(x, y) is_set(state, explicit_rotation, x, y)
 
@@ -51,21 +56,27 @@ int determine_block_id(const field_state &state, const int x, const int y)
 
             // I(0,2)
             if (IB(x + 3, y)) {
-                if (explicit_rotation == -1) {
-                    abort();
+                if (er == -1) {
+                    return nullopt;
+                }
+                else {
+                    return make_optional<mpe::block>(bI, er);
                 }
             }
 
             // L(2)
             else if (IB(x + 2, y + 1)) {
+                return make_optional<mpe::block>(bL, 2);
             }
 
             // J(2)
             else if (IB(x, y + 1)) {
+                return make_optional<mpe::block>(bJ, 2);
             }
 
             // T(2)
             else if (IB(x + 1, y + 1)) {
+                return make_optional<mpe::block>(bT, 2);
             }
         }
 
@@ -74,19 +85,26 @@ int determine_block_id(const field_state &state, const int x, const int y)
 
             // L(3)
             if (IB(x, y + 2)) {
+                return make_optional<mpe::block>(bL, 3);
             }
 
             // Z(0,2)
             else if (IB(x - 1, y + 1)) {
-                if (explicit_rotation == -1) {
-                    abort();
+                if (er == -1) {
+                    return nullopt;
+                }
+                else {
+                    return make_optional<mpe::block>(bZ, er);
                 }
             }
 
             // O(0,1,2,3,4)
             else if (IB(x + 1, y + 1)) {
-                if (explicit_rotation == -1) {
-                    abort();
+                if (er == -1) {
+                    return nullopt;
+                }
+                else {
+                    return make_optional<mpe::block>(bO, er);
                 }
             }
         }
@@ -96,12 +114,17 @@ int determine_block_id(const field_state &state, const int x, const int y)
 
             // J(1)
             if (IB(x + 1, y + 2)) {
+                return make_optional<mpe::block>(bJ, 1);
             }
 
             // S(0,2)
             else if (IB(x + 2, y + 1)) {
-                if (explicit_rotation == -1) {
+                if (er == -1) {
+                    return nullpot;
                     abort();
+                }
+                else {
+                    return make_optional<mpe::block>(bS, er);
                 }
             }
         }
@@ -115,29 +138,37 @@ int determine_block_id(const field_state &state, const int x, const int y)
 
             // I(1, 3)
             if (IB(x, y + 3)) {
-                if (explicit_rotation == -1) {
-                    abort();
+                if (er == -1) {
+                    return nullopt;
+                }
+                else {
+                    return make_optional<mpe::block>(bI, er);
                 }
             }
 
             // T(1)
             else if (IB(x, y + 1)) {
+                return make_optional<mpe::block>(bT, 1);
             }
 
             // T(3)
             else if (IB(x + 2, y + 1)) {
+                return make_optional<mpe::block>(bT, 3);
             }
 
             // L(1)
             else if (IB(x, y + 2)) {
+                return make_optional<mpe::block>(bL, 1);
             }
 
             // L(3)
             else if (IB(x + 2, y)) {
+                return make_optional<mpe::block>(bL, 3);
             }
 
             // J(3)
             else if (IB(x + 2, y + 2)) {
+                return make_optional<mpe::block>(bJ, 3);
             }
         }
 
@@ -146,12 +177,16 @@ int determine_block_id(const field_state &state, const int x, const int y)
 
             // J(0)
             if (IB(x + 2, y + 1)) {
+                return make_optional<mpe::block>(bJ, 0);
             }
 
             // Z(1,3)
             else if (IB(x + 1, y + 2)) {
-                if (explicit_rotation == -1) {
-                    abort();
+                if (er == -1) {
+                    return nullopt;
+                }
+                else {
+                    return make_optional<mpe::block>(bJ, er);
                 }
             }
         }
@@ -161,8 +196,11 @@ int determine_block_id(const field_state &state, const int x, const int y)
 
             // S(1,3)
             if (IB(x - 1, y + 2)) {
-                if (explicit_rotation == -1) {
-                    abort();
+                if (er == -1) {
+                    return nullopt;
+                }
+                else {
+                    return make_optional<mpe::block>(bS, er);
                 }
             }
         }
@@ -210,7 +248,13 @@ void set_state(mpe::field &field, mpe::block &block, const field_state &state)
                 break;
               case 'o':
                 if (!calculated_block) {
-                    block = mpe::block(determine_block_id(state, x, y));
+                    auto block_wrapper = determine_block_id(state, x, y);
+                    if (!block_wrapper) {
+                        abort();
+                    }
+                    else {
+                        block = block_wrapper.value();
+                    }
                     calculated_block = true;
                 }
                 break;

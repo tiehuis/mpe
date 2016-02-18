@@ -1,9 +1,8 @@
 #include <chrono>
+#include <clocale>
 #include <ratio>
 #include <thread>
 
-#include <cstdio>
-#include <clocale>
 #include <mpe/engine.hpp>
 
 #include "ui.hpp"

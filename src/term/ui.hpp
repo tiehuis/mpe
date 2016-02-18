@@ -52,6 +52,7 @@ class ui
         initscr();
         curs_set(0);
         timeout(0);
+        noecho();
         if (has_colors())
             start_color();
 
@@ -171,7 +172,7 @@ class ui
     void render_block(const int x, const int y, mpe::block &block) const
     {
         attron(COLOR_PAIR(block.id + 1));
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < block.data.size(); ++i) {
             const int xa = x + 2 * block.data[i].x;
             const int ya = y - block.data[i].y;
             mvaddstr(ya, xa, "\u25a0 ");
