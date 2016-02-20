@@ -10,7 +10,7 @@ namespace mpe {
 static const int c_initial_x = 3;
 
 // The initial Y position a block is spawned at
-static const int c_initial_y = 21;
+static const int c_initial_y = 24;
 
 // Blocks are not necessarily composed of 4-pieces, so a dynarray is
 // a suitable container for storage, and is better than a vector.

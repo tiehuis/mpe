@@ -7,20 +7,19 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <memory>
 #include <thread>
 #include <experimental/optional>
 
-#include "mpe/block.hpp"
-#include "mpe/field.hpp"
-#include "mpe/keystate.hpp"
-#include "mpe/option.hpp"
-#include "mpe/randomizer/bag.hpp"
-#include "mpe/wallkick/srs.hpp"
-#include "mpe/rule/line_race.hpp"
-#include "mpe/statistics.hpp"
-
-#include <stdio.h>
+#include <mpe/block.hpp>
+#include <mpe/field.hpp>
+#include <mpe/keystate.hpp>
+#include <mpe/option.hpp>
+#include <mpe/randomizer/bag.hpp>
+#include <mpe/wallkick/srs.hpp>
+#include <mpe/rule/line_race.hpp>
+#include <mpe/statistics.hpp>
 
 namespace mpe {
 
@@ -31,7 +30,7 @@ class engine {
     ///---
 
     // Initialize engine with the specified options (hardcoded now)
-    engine() : running(true), ticks(0) {
+    engine() : running(true), ticks(0), gravity(1.0/64), gravity_count(0) {
         rule       = std::make_unique<mpe::rule::line_race>();
         randomizer = std::make_unique<mpe::randomizer::bag>();
         wallkick   = std::make_unique<mpe::wallkick::SRS>();
@@ -109,6 +108,14 @@ class engine {
             block = randomizer->next();
         }
 
+        // Apply gravity
+        gravity_count += gravity;
+        if (gravity_count > 1) {
+            float cells_to_move;
+            gravity_count = std::modf(gravity_count, &cells_to_move);
+            block.move_n(field, 0, -(int) cells_to_move);
+        }
+
         ghost = block;
         ghost.hard_drop(field);
 
@@ -134,6 +141,12 @@ class engine {
 
     // How many ticks have elapsed since this game started?
     int ticks;
+
+    // The current gravity in cells moved per frame
+    float gravity;
+
+    // The current gravity counter.
+    float gravity_count;
 
     // The current rule we are playing with
     std::unique_ptr<mpe::rule::interface> rule;
