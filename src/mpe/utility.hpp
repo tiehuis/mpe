@@ -26,7 +26,7 @@ constexpr typename std::underlying_type<T>::type enum_cast(T t)
 }
 
 // A macro to calculate at compile-time the directory of the current file
-#define MPE_COMPILE_TIME_CURRENT_DIR                              \
+#define MPE_compile_time_current_dir                              \
 ({                                                                \
     std::string current_path(__FILE__);                           \
     current_path.substr(0, current_path.find_last_of("/")) + "/"; \

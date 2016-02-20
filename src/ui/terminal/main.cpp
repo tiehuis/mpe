@@ -1,13 +1,16 @@
+///
+// main.cpp
+//
+// The frontend entry point for the terminal interface.
+
 #include <chrono>
 #include <clocale>
 #include <ratio>
 #include <thread>
 
 #include <mpe/engine.hpp>
+#include <ui/terminal/graphics.hpp>
 
-#include "ui.hpp"
-
-// Frame rate specifies the number of frame updates per second
 constexpr int framerate = 60;
 
 // Tick rate specifies the number of engine updates per second. Tickrates
@@ -17,33 +20,33 @@ constexpr int tickrate = framerate;
 // It makes no sense for tickrate to be less than framerate
 static_assert(tickrate >= framerate);
 
-// Define the duration of a single tick
 constexpr std::chrono::duration<int, std::ratio<1, tickrate>> ticktime(1);
 
-int main(void)
+int main(int argc, char **argv)
 {
-    // Important to call this before the ui constructor
+    // Ensure we aren't using the C/Ascii locale so unicode characters render
     std::setlocale(LC_ALL, "");
     mpe::engine engine;
 
+    bool unicode = argc > 1 ? false : true;
+
+    // Close the graphics class seperately so that we can perform actions
+    // once the graphics context has been cleared.
     {
-        mpe::ui ui;
+        graphics gfx(unicode);
 
         while (engine.running) {
             auto next_time_point = std::chrono::steady_clock::now() + ticktime;
 
             // Limit draw phase to 60 frames regardless of internal tick counter
             if (engine.ticks % (tickrate / framerate) == 0) {
-                // Render current game status
-                ui.render(engine);
-
-                // Update engine keys
-                ui.update(engine);
+                gfx.render(engine);
+                gfx.update(engine);
             }
 
-            // Process game tick
             engine.update();
 
+            // TODO: This assumes that we will complete processing in one frame
             std::this_thread::sleep_until(next_time_point);
         }
     }
